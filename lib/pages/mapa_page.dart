@@ -6,60 +6,97 @@ import 'package:mapapp/bloc/mi_ubicacion/mi_ubicacion_bloc.dart';
 import 'package:mapapp/widgets/widgets.dart';
 
 class MapaPage extends StatefulWidget {
+
   @override
   _MapaPageState createState() => _MapaPageState();
 }
 
 class _MapaPageState extends State<MapaPage> {
+
   @override
   void initState() {
+    
     context.bloc<MiUbicacionBloc>().iniciarSeguimiento();
+
     super.initState();
   }
 
   @override
   void dispose() {
-    context.bloc<MiUbicacionBloc>().cancelarSubscription();
+    context.bloc<MiUbicacionBloc>().cancelarSeguimiento();
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      body: BlocBuilder<MiUbicacionBloc, MiUbicacionState>(
-          builder: (_, state) => crearMapa(state)),
+      body: Stack(
+        children: [
+
+          BlocBuilder<MiUbicacionBloc, MiUbicacionState>(
+            builder: ( _ , state)  => crearMapa( state )
+          ),
+
+          Positioned(
+            top: 15,
+            child: SearchBar()
+          ),
+
+          
+          MarcadorManual(),
+
+        ],
+      ),
+
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+
           BtnUbicacion(),
+
           BtnSeguirUbicacion(),
+
           BtnMiRuta(),
+
         ],
       ),
-    );
+   );
+
   }
 
-  Widget crearMapa(MiUbicacionState state) {
-    if (!state.existeUbicacion) return Center(child: Text("Ubicando..."));
+  Widget crearMapa(MiUbicacionState state ) {
+
+    if ( !state.existeUbicacion ) return Center(child: Text('Ubicando...'));
 
     final mapaBloc = BlocProvider.of<MapaBloc>(context);
-    mapaBloc.add(OnNuevaUbicacion(state.ubicacion));
 
-    final camaraPosition = new CameraPosition(
+    mapaBloc.add( OnNuevaUbicacion( state.ubicacion ) );
+
+    final cameraPosition = new CameraPosition(
       target: state.ubicacion,
-      zoom: 15,
+      zoom: 15
     );
-    return GoogleMap(
-      initialCameraPosition: camaraPosition,
-      myLocationButtonEnabled: false,
-      myLocationEnabled: true,
-      zoomControlsEnabled: false,
-      onMapCreated: mapaBloc.initMap,
-      polylines: mapaBloc.state.polylines.values.toSet(),
-      onCameraMove: ( cameraPosition ) {
-      // cameraPosition.target = LatLng central del mapa
-        mapaBloc.add( OnMovioMapa( cameraPosition.target ));
+
+    return BlocBuilder<MapaBloc, MapaState>(
+      builder: (context, _ ) {
+        return GoogleMap(
+          initialCameraPosition: cameraPosition,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,
+          zoomControlsEnabled: false,
+          onMapCreated: mapaBloc.initMapa,
+          polylines:  mapaBloc.state.polylines.values.toSet(),
+          onCameraMove: ( cameraPosition ) {
+            // cameraPosition.target = LatLng central del mapa
+            mapaBloc.add( OnMovioMapa( cameraPosition.target ));
+          },
+        );
       },
     );
+   
+
   }
+
 }

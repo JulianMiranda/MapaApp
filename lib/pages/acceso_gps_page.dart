@@ -12,6 +12,7 @@ class _AccesoGpsPageState extends State<AccesoGpsPage> with WidgetsBindingObserv
 
   bool popup = false;
 
+
   @override
   void initState() {
     
@@ -28,7 +29,7 @@ class _AccesoGpsPageState extends State<AccesoGpsPage> with WidgetsBindingObserv
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async{
     
-    if (  state == AppLifecycleState.resumed && popup) {
+    if (  state == AppLifecycleState.resumed && !popup ) {
       if ( await Permission.location.isGranted  ) {
         Navigator.pushReplacementNamed(context, 'loading');
       }
@@ -56,7 +57,8 @@ class _AccesoGpsPageState extends State<AccesoGpsPage> with WidgetsBindingObserv
               onPressed: () async {
                 popup = true;
                 final status = await Permission.location.request();
-               await this.accesoGPS( status );
+                await this.accesoGPS( status );
+
                 popup = false;
 
               }
@@ -73,7 +75,7 @@ class _AccesoGpsPageState extends State<AccesoGpsPage> with WidgetsBindingObserv
     switch ( status ) {
       
       case PermissionStatus.granted:
-       await Navigator.pushReplacementNamed(context, 'mapa');
+        await Navigator.pushReplacementNamed(context, 'loading');
         break;
         
       case PermissionStatus.undetermined:

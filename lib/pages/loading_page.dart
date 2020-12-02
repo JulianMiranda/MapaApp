@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart' as Geolocator;
-import 'package:permission_handler/permission_handler.dart';
-
+import 'package:geolocator/geolocator.dart';
 import 'package:mapapp/helpers/helpers.dart';
 import 'package:mapapp/pages/acceso_gps_page.dart';
 import 'package:mapapp/pages/mapa_page.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 class LoadingPage extends StatefulWidget {
+
   @override
   _LoadingPageState createState() => _LoadingPageState();
 }
@@ -26,50 +27,50 @@ class _LoadingPageState extends State<LoadingPage> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
+  void didChangeAppLifecycleState(AppLifecycleState state) async{
     
-    if (state == AppLifecycleState.resumed) {
-      if (await Geolocator.isLocationServiceEnabled()) {
-         Navigator.pushReplacement(
-          context, navegarMapaFadeIn(context, MapaPage()));
+    if (  state == AppLifecycleState.resumed ) {
+      if ( await Geolocator.isLocationServiceEnabled()  ) {
+        Navigator.pushReplacement(context, navegarMapaFadeIn(context, MapaPage() ));
       }
     }
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: chckGpsAndLocation(context),
+        future: this.checkGpsYLocation(context),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            return Center(child: Text(snapshot.data));
+          
+          if ( snapshot.hasData ) {
+            return Center(child: Text( snapshot.data ) );
           } else {
-            return Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
-            );
+            return Center(child: CircularProgressIndicator(strokeWidth: 2 ) );
           }
+          
         },
       ),
-    );
+   );
   }
 
-  Future chckGpsAndLocation(BuildContext context) async {
-    final permisoGps = await Permission.location.isGranted;
-    final gpsActivo = await Geolocator.isLocationServiceEnabled();
-    if (permisoGps && gpsActivo) {
-      Navigator.pushReplacement(
-          context, navegarMapaFadeIn(context, MapaPage()));
+  Future checkGpsYLocation( BuildContext context ) async {
+
+    // PermisoGPS
+    final permisoGPS = await Permission.location.isGranted;
+    // GPS está activo
+    final gpsActivo  = await Geolocator.isLocationServiceEnabled();
+
+    if ( permisoGPS && gpsActivo ) {
+      Navigator.pushReplacement(context, navegarMapaFadeIn(context, MapaPage() ));
       return '';
-    } else if (!permisoGps) {
-      Navigator.pushReplacement(
-          context, navegarMapaFadeIn(context, AccesoGpsPage()));
-      return 'Es necesario permisos de Gps';
+    } else if ( !permisoGPS ) {
+      Navigator.pushReplacement(context, navegarMapaFadeIn(context, AccesoGpsPage() ));  
+      return 'Es necesario el permiso de GPS';
     } else {
-      return 'Active Gps';
+      return 'Active el GPS';
     }
 
-    //Navigator.pushReplacement(context, navegarMapaFadeIn(context, AccesoGpsPage()));
-    //
   }
 }

@@ -1,8 +1,6 @@
 part of 'helpers.dart';
 
 
-
-
 Route navegarMapaFadeIn( BuildContext context, Widget page ) {
 
   return PageRouteBuilder(
@@ -22,4 +20,3 @@ Route navegarMapaFadeIn( BuildContext context, Widget page ) {
   );
 
 }
-
